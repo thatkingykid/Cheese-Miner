@@ -84,14 +84,14 @@ namespace CheeseMinerBuild1
                 bool broken = false;
                 for (int i = 0; 0 < playerData.Length; i++) //loop around and get player info
                 {
-                    Console.WriteLine("Player ", i + 1); //write which player we are collecting info for
+                    Console.WriteLine("Player " + (i + 1)); //write which player we are collecting info for
                     playerData[i].playerID = i; //write ID based on index
                     Console.WriteLine("What is your name? ");
                     playerData[i].playerName = Console.ReadLine();
                     Console.WriteLine("What colour would you like to be? You can pick from: Red, Blue, Green, Yellow"); //ask for colour selection
                     colourCatcher = Console.ReadLine();
 
-                    if (colourCatcher.ToLower() == "red" || colourCatcher.ToLower() == "blue" || colourCatcher.ToLower() == "green" || colourCatcher.ToLower() == "yellow")
+                    if (colourCatcher.ToLower() != "red" || colourCatcher.ToLower() != "blue" || colourCatcher.ToLower() != "green" || colourCatcher.ToLower() != "yellow")
                     //ensure we got a valid input
                     {
                         Console.WriteLine("Due to printing issues, the colours selected are unavailable, please try again!");
@@ -108,7 +108,6 @@ namespace CheeseMinerBuild1
                             break; //break out of nested loop
                         }
                     }
-
                     if (broken == true) //check if we broke out of the nested loop
                     {
                         i = i - 1; //move the index back one
@@ -132,7 +131,7 @@ namespace CheeseMinerBuild1
                     Console.WriteLine("Player ", i, "place your cheese using x and y co-ordinates.");
                     for (int j = 0; j < 4; j++) //loop through the player's four cheese pieces
                     {
-                        Console.WriteLine("Cheese piece ", j + 1);
+                        Console.WriteLine("Cheese piece ", (j + 1));
                         Console.WriteLine("Enter X co-ordinate ");
                         try //attempt to catch an X co-ordinate
                         {
@@ -158,7 +157,7 @@ namespace CheeseMinerBuild1
                         }
                         catch (System.FormatException) //catch any incorrect format exceptions
                         {
-                            Console.WriteLine("Sadly, that is not an X co-ordinate, please try again.", Environment.NewLine);
+                            Console.WriteLine("Sadly, that is not a Y co-ordinate, please try again.", Environment.NewLine);
                             j = j - 1; //restart iteration
                             continue;
                         }
