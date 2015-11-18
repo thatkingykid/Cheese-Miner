@@ -1,11 +1,12 @@
 ﻿/*
-Space Cheese Mining v0.1.0
+Space Cheese Mining v0.1.5
 James King
 08101
 
 Implemented in this build:
 - Player selection
 - Cheese placement
+- Methodisation and improvement of system structure
 
 Next build will implement:
 - Movement system
@@ -20,7 +21,7 @@ namespace CheeseMinerBuild1
 {
     class Program
     {
-        enum player_colour //declare an enum for player colour for general tidyness
+        public enum player_colour //declare an enum for player colour for general tidyness
         { blue, red, yellow, green }
 
         struct player_info //declare a structure for holding all player data
@@ -29,75 +30,95 @@ namespace CheeseMinerBuild1
             public player_colour playerColour;
             public string playerName;
             public int playerStash;
+            public int xCoordinates;
+            public int yCoordinates;
         }
         static void Main(string[] args)
         {
             string finalInput = null; //declare a string to catch the input that terminates the program
-            int numberOfPlayers = 0;
-            do //begin main execution block
+            player_info[] player_data = null;
+            int playerAmount = 0;
+            bool[,] cheeseBoard = null;
+
+            Console.WriteLine("Welcome to Space Cheese Miner!");
+            player_data = PlayerCollection(playerData: ref player_data, numberOfPlayers: ref playerAmount); //begin method that collects player data
+
+            do //begin main execution block of the game
             {
-                Console.WriteLine("Welcome to Space Cheese Miner!");
+                cheeseBoard = CheesePlacer(cheesePosition: ref cheeseBoard, playerNumber: playerAmount); //begin method that collects data on where the cheese will be placed
 
-                for (int i = 0; i < 100000000; i++) //start loop for handling exceptions
+
+
+                Console.WriteLine("Do you wish to end the game? [Y]es or [N]o"); //get input if the user wants to end the session
+                finalInput = Console.ReadLine();
+                if (finalInput.ToUpper() == "Y" || finalInput.ToUpper() == "YES")
                 {
-                    Console.WriteLine("How many players are there? ");
-                    try //attempt to execute this code
-                    {
-                        numberOfPlayers = int.Parse(Console.ReadLine());
-                    }
-                    catch (System.FormatException) //when a user cocks up, do this to stop the system from crashing
-                    {
-                        Console.WriteLine("That's not a number!"); //throw error
-                        Console.WriteLine(Environment.NewLine); //render a new line
-                        continue; //restart chunk
-                    }
+                    break;
+                }
+            } while (finalInput.ToUpper() != "N" || finalInput.ToUpper() != "NO"); //finish execution block when players are done
+        }
+        static player_info[] PlayerCollection(ref player_info[] playerData, ref int numberOfPlayers)
+        {
 
-                    if (numberOfPlayers < 0) //check user hasn't entered a negative value
-                    {
-                        Console.WriteLine("Either you've entered an alternate dimension,", Environment.NewLine, "where man can exist in negative form, or you're trying to break the system.", Environment.NewLine);
-                        continue;
-                    }
-                    else if (numberOfPlayers == 0) //check user hasn't set input to 0
-                    {
-                        Console.WriteLine("Den who was input??????", Environment.NewLine);
-                        continue;
-                    }
-                    else if (numberOfPlayers == 1) //check user hasn't set input to 1
-                    {
-                        Console.WriteLine("Ah yes, the lonely nights spent playing cheese miner with youself.");
-                        Console.WriteLine(Environment.NewLine);
-                        continue;
-                    }
-                    else if (numberOfPlayers > 4) //check there aren't too many players
-                    {
-                        Console.WriteLine("Though time is infinite, sadly RAM is not, please select 4 or less players.", Environment.NewLine);
-                        continue;
-                    }
-                    else
-                    {
-                        break; //exit out of the loop when the inputs are valid
-                    }
+            for (int i = 0; i < 100000000; i++) //start loop for handling exceptions
+            {
+                Console.WriteLine("How many players are there? ");
+                try //attempt to execute this code
+                {
+                    numberOfPlayers = int.Parse(Console.ReadLine());
+                }
+                catch (System.FormatException) //when a user cocks up, do this to stop the system from crashing
+                {
+                    Console.WriteLine("That's not a number!"); //throw error
+                    Console.WriteLine(Environment.NewLine); //render a new line
+                    continue; //restart chunk
                 }
 
-                player_info[] playerData = new player_info[numberOfPlayers]; //make a new structure for the number of players
-                string colourCatcher;
-                bool broken = false;
-                for (int i = 0; 0 < playerData.Length; i++) //loop around and get player info
-                {
-                    Console.WriteLine("Player " + (i + 1)); //write which player we are collecting info for
-                    playerData[i].playerID = i; //write ID based on index
-                    Console.WriteLine("What is your name? ");
-                    playerData[i].playerName = Console.ReadLine();
-                    Console.WriteLine("What colour would you like to be? You can pick from: Red, Blue, Green, Yellow"); //ask for colour selection
-                    colourCatcher = Console.ReadLine();
 
-                    if (colourCatcher.ToLower() != "red" || colourCatcher.ToLower() != "blue" || colourCatcher.ToLower() != "green" || colourCatcher.ToLower() != "yellow")
-                    //ensure we got a valid input
-                    {
-                        Console.WriteLine("Due to printing issues, the colours selected are unavailable, please try again!");
-                        i = i - 1; //move index one back
-                        continue; //restart our loop
-                    }
+                if (numberOfPlayers < 0) //check user hasn't entered a negative value
+                {
+                    Console.WriteLine("Either you've entered an alternate dimension,", Environment.NewLine, "where man can exist in negative form, or you're trying to break the system.", Environment.NewLine);
+                    continue;
+                }
+                else if (numberOfPlayers == 0) //check user hasn't set input to 0
+                {
+                    Console.WriteLine("Den who was input??????", Environment.NewLine);
+                    continue;
+                }
+                else if (numberOfPlayers == 1) //check user hasn't set input to 1
+                {
+                    Console.WriteLine("Ah yes, the lonely nights spent playing cheese miner with youself.");
+                    Console.WriteLine(Environment.NewLine);
+                    continue;
+                }
+                else if (numberOfPlayers > 4) //check there aren't too many players
+                {
+                    Console.WriteLine("Though time is infinite, sadly RAM is not, please select 4 or less players.", Environment.NewLine);
+                    continue;
+                }
+                else
+                {
+                    break; //exit out of the loop when the inputs are valid
+                }
+            }
+
+
+            playerData = new player_info[numberOfPlayers]; //make a new structure for the number of players
+            string colourCatcher;
+            for (int i = 0; i < playerData.Length; i = i + 1) //loop around and get player info
+            {
+                bool broken = false;
+
+                Console.WriteLine("Player " + (i + 1)); //write which player we are collecting info for
+                playerData[i].playerID = i; //write ID based on index
+                Console.WriteLine("What is your name? ");
+                playerData[i].playerName = Console.ReadLine();
+                Console.WriteLine("What colour would you like to be? You can pick from: Red, Blue, Green, Yellow"); //ask for colour selection
+                colourCatcher = Console.ReadLine();
+
+                if (colourCatcher.ToLower() == "red" || colourCatcher.ToLower() == "blue" || colourCatcher.ToLower() == "green" || colourCatcher.ToLower() == "yellow")
+                //ensure we got a valid input
+                {
 
                     for (int j = 0; j < i; j++) //nest a new loop
                     {
@@ -107,7 +128,9 @@ namespace CheeseMinerBuild1
                             broken = true; //set a break variable to true if so
                             break; //break out of nested loop
                         }
+
                     }
+
                     if (broken == true) //check if we broke out of the nested loop
                     {
                         i = i - 1; //move the index back one
@@ -120,77 +143,110 @@ namespace CheeseMinerBuild1
                     Console.WriteLine("Player details saved!");
                     Console.WriteLine(Environment.NewLine);
                 }
-
-                bool[,] cheesePosition = new bool[8, 8]; //make a new boolean array for the position of the cheese
-                int cheeseCatcherX;
-                int cheeseCatcherY;
-                Console.WriteLine("Now to place the cheese on the board. ");
-
-                for (int i = 0; i < playerData.Length; i++) //loop through each player for their turn adding cheese
+                else
                 {
-                    Console.WriteLine("Player ", i, "place your cheese using x and y co-ordinates.");
-                    for (int j = 0; j < 4; j++) //loop through the player's four cheese pieces
+                    Console.WriteLine("Due to printing issues, the colours selected are unavailable, please try again!");
+                    i = i - 1; //move index one back
+                    continue; //restart our loop
+                }
+
+
+            }
+
+            return playerData;
+        }
+        static bool[,] CheesePlacer(ref bool[,] cheesePosition, int playerNumber)
+        {
+            cheesePosition = new bool[8, 8]; //make a new boolean array for the position of the cheese
+            int cheeseCatcherX;
+            int cheeseCatcherY;
+            Console.WriteLine("Now to place the cheese on the board. ");
+
+            for (int i = 0; i < playerNumber; i++) //loop through each player for their turn adding cheese
+            {
+                Console.WriteLine("Player " + (i + 1) + " place your cheese using x and y co-ordinates.");
+                for (int j = 0; j < 4; j++) //loop through the player's four cheese pieces
+                {
+                    Console.WriteLine("Cheese piece " + (j + 1));
+                    Console.WriteLine("Enter X co-ordinate ");
+                    try //attempt to catch an X co-ordinate
                     {
-                        Console.WriteLine("Cheese piece ", (j + 1));
-                        Console.WriteLine("Enter X co-ordinate ");
-                        try //attempt to catch an X co-ordinate
-                        {
-                            cheeseCatcherX = int.Parse(Console.ReadLine());
-                        }
-                        catch (System.FormatException) //throw an error if the format is invalid
-                        {
-                            Console.WriteLine("Sadly, that is not an X co-ordinate, please try again.", Environment.NewLine);
-                            j = j - 1; //restart the current iteration of J
-                            continue;
-                        }
+                        cheeseCatcherX = int.Parse(Console.ReadLine());
+                    }
+                    catch (System.FormatException) //throw an error if the format is invalid
+                    {
+                        Console.WriteLine("Sadly, that is not an X co-ordinate, please try again.", Environment.NewLine);
+                        j = j - 1; //restart the current iteration of J
+                        continue;
+                    }
 
-                        if (cheeseCatcherX > 8 || cheeseCatcherX < 0) //check it is a position on the board
-                        {
-                            Console.WriteLine("Space is infinite, unlike our board, please input a value between 0 and 8.", Environment.NewLine);
-                            j = j - 1; //restart if not
-                            continue;
-                        }
-                        Console.WriteLine("Enter Y co-ordinates");
-                        try //attempt to catch the Y co-ordinate
-                        {
-                            cheeseCatcherY = int.Parse(Console.ReadLine());
-                        }
-                        catch (System.FormatException) //catch any incorrect format exceptions
-                        {
-                            Console.WriteLine("Sadly, that is not a Y co-ordinate, please try again.", Environment.NewLine);
-                            j = j - 1; //restart iteration
-                            continue;
-                        }
+                    if (cheeseCatcherX > 8 || cheeseCatcherX < 0) //check it is a position on the board
+                    {
+                        Console.WriteLine("Space is infinite, unlike our board, please input a value between 0 and 8.", Environment.NewLine);
+                        j = j - 1; //restart if not
+                        continue;
+                    }
+                    Console.WriteLine("Enter Y co-ordinates");
+                    try //attempt to catch the Y co-ordinate
+                    {
+                        cheeseCatcherY = int.Parse(Console.ReadLine());
+                    }
+                    catch (System.FormatException) //catch any incorrect format exceptions
+                    {
+                        Console.WriteLine("Sadly, that is not a Y co-ordinate, please try again.", Environment.NewLine);
+                        j = j - 1; //restart iteration
+                        continue;
+                    }
 
-                        if (cheeseCatcherY > 8 || cheeseCatcherY < 0) //check if it isn't a position on the board
-                        {
-                            Console.WriteLine("Space is infinite, unlike our board, please input a value between 0 and 8.", Environment.NewLine);
-                            j = j - 1;
-                            continue; //restart iteration
-                        }
+                    if (cheeseCatcherY > 8 || cheeseCatcherY < 0) //check if it isn't a position on the board
+                    {
+                        Console.WriteLine("Space is infinite, unlike our board, please input a value between 0 and 8.", Environment.NewLine);
+                        j = j - 1;
+                        continue; //restart iteration
+                    }
 
-                        if (cheesePosition[cheeseCatcherX, cheeseCatcherY] == true) //check position isn't currently occupied
-                        {
-                            Console.WriteLine("Position already occupied, please select a new value.", Environment.NewLine);
-                            j = j - 1; //restart if it is
-                            continue;
-                        }
-                        else //if not
-                        {
-                            cheesePosition[cheeseCatcherX, cheeseCatcherY] = true; //set boolean flag for the cheese at given x,y to true
-                            Console.WriteLine("Cheese successfully added.");
-                            Console.WriteLine(Environment.NewLine);
-                        }
+                    switch (cheeseCatcherX)
+                    {
+                        case 0:
+                            if (cheeseCatcherY == 0 || cheeseCatcherY == 7)
+                            {
+                                Console.WriteLine("Cannot place cheese here as it is a spawning space. ");
+                                j = j - 1;
+                                continue;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        case 7:
+                            if (cheeseCatcherY == 0 || cheeseCatcherY == 7)
+                            {
+                                Console.WriteLine("Cannot place cheese here as it is a spawning space. ");
+                                j = j - 1;
+                                continue;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                    }
+
+                    if (cheesePosition[cheeseCatcherX, cheeseCatcherY] == true) //check position isn't currently occupied
+                    {
+                        Console.WriteLine("Position already occupied, please select a new value.", Environment.NewLine);
+                        j = j - 1; //restart if it is
+                        continue;
+                    }
+                    else //if not
+                    {
+                        cheesePosition[cheeseCatcherX, cheeseCatcherY] = true; //set boolean flag for the cheese at given x,y to true
+                        Console.WriteLine("Cheese successfully added.");
+                        Console.WriteLine(Environment.NewLine);
                     }
                 }
-
-                Console.WriteLine("Do you wish to end the game? [Y]es or [N]o"); //get input if the user wants to end the session
-                finalInput = Console.ReadLine();
-                if (finalInput.ToUpper() == "Y" || finalInput.ToUpper() == "YES")
-                {
-                    break;
-                }
-            } while (finalInput.ToUpper() != "N" || finalInput.ToUpper() != "NO"); //finish execution block when players are done
+            }
+            return cheesePosition;
         }
     }
 }
+
