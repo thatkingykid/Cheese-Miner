@@ -46,7 +46,7 @@ namespace CheeseMinerBuild1
             do //begin main execution block of the game
             {
                 cheeseBoard = CheesePlacer(cheesePosition: ref cheeseBoard, playerNumber: playerAmount); //begin method that collects data on where the cheese will be placed
-
+                player_data = PlayerResetter(playerInfo: ref player_data); //reset the player's position on the board
 
 
                 Console.WriteLine("Do you wish to end the game? [Y]es or [N]o"); //get input if the user wants to end the session
@@ -160,12 +160,23 @@ namespace CheeseMinerBuild1
             cheesePosition = new bool[8, 8]; //make a new boolean array for the position of the cheese
             int cheeseCatcherX;
             int cheeseCatcherY;
+            int cheesePerPlayer;
+
+            if (playerNumber == 3) //check if we have an odd number of players
+            {
+                cheesePerPlayer = 5; //if so, remove one of the cheeses so it divides evenly
+            }
+            else
+            {
+                cheesePerPlayer = (16 / playerNumber); //otherwise, divide up the cheeses
+            }
+
             Console.WriteLine("Now to place the cheese on the board. ");
 
             for (int i = 0; i < playerNumber; i++) //loop through each player for their turn adding cheese
             {
                 Console.WriteLine("Player " + (i + 1) + " place your cheese using x and y co-ordinates.");
-                for (int j = 0; j < 4; j++) //loop through the player's four cheese pieces
+                for (int j = 0; j < cheesePerPlayer; j++) //loop through the player's cheese pieces
                 {
                     Console.WriteLine("Cheese piece " + (j + 1));
                     Console.WriteLine("Enter X co-ordinate ");
@@ -246,6 +257,43 @@ namespace CheeseMinerBuild1
                 }
             }
             return cheesePosition;
+        }
+        static player_info[] PlayerResetter(ref player_info[] playerInfo)
+        {
+            if (playerInfo.Length == 2) //check if we have 2 players
+            {
+                playerInfo[0].xCoordinates = 0;
+                playerInfo[0].yCoordinates = 0;
+                //place them at opposite board ends
+                playerInfo[1].xCoordinates = 7;
+                playerInfo[1].yCoordinates = 7;
+            }
+            else if (playerInfo.Length == 3) //check if we have 3 players
+            {
+                playerInfo[0].xCoordinates = 0;
+                playerInfo[0].yCoordinates = 0;
+                //place them in an L shape across the board
+                playerInfo[1].xCoordinates = 7;
+                playerInfo[1].yCoordinates = 0;
+
+                playerInfo[2].xCoordinates = 0;
+                playerInfo[2].yCoordinates = 7;
+            }
+            else
+            {
+                playerInfo[0].xCoordinates = 0;
+                playerInfo[0].yCoordinates = 0;
+                //place all four players in the corners of the board
+                playerInfo[1].xCoordinates = 7;
+                playerInfo[1].yCoordinates = 0;
+
+                playerInfo[2].xCoordinates = 0;
+                playerInfo[2].yCoordinates = 7;
+
+                playerInfo[2].xCoordinates = 7;
+                playerInfo[2].yCoordinates = 7;
+            }
+            return playerInfo;
         }
     }
 }
