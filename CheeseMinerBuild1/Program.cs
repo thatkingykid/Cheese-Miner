@@ -1,5 +1,5 @@
 ﻿/*
-Space Cheese Mining v0.1.5
+Space Cheese Mining v0.2
 James King
 08101
 
@@ -53,22 +53,22 @@ namespace CheeseMinerBuild1
 
                 cheeseBoard = CheesePlacer(cheesePosition: ref cheeseBoard, playerNumber: playerAmount); //begin method that collects data on where the cheese will be placed
                 player_data = PlayerResetter(playerInfo: ref player_data); //reset the player's position on the board
-                int startingPlayer = CheeseHead(playerList: player_data);
-                currentPlayer = startingPlayer;
-                char direction;
+                int startingPlayer = CheeseHead(playerList: player_data); //begin method which finds out who starts the game
+                currentPlayer = startingPlayer; //get the index of the player who starts the game
+                char direction; //initialise the direction character
 
                 while (gameWon == false)
                 {
                     Console.WriteLine("Player " + (currentPlayer + 1) + ", " + player_data[currentPlayer].playerName);
                     Console.WriteLine("You are on X Position: " + player_data[currentPlayer].xCoordinates);
                     Console.WriteLine("You are on Y Position: " + player_data[currentPlayer].yCoordinates);
-                    int diceRoll = RollDice();
+                    int diceRoll = RollDice(); //find what number they rolled using the roll dice method
                     Console.WriteLine("You rolled a " + diceRoll);
-                    direction = MovementCatcher();
-                    Console.WriteLine("You are moving " + diceRoll + " spaces in a " + direction + " direction");
-                    MovementCalculator(playerList: ref player_data[currentPlayer], roll: diceRoll, movement: direction);
-                    Console.WriteLine("You are now at X: " + player_data[currentPlayer].xCoordinates + " and Y: " + player_data[currentPlayer].yCoordinates);
-                    cheeseBoard = CheeseCollector(board: ref cheeseBoard, playerDetails: ref player_data[currentPlayer]);
+                    direction = MovementCatcher(); //find out what direction the user wants to move in using the movement catcher method
+                    Console.WriteLine("You are moving " + diceRoll + " spaces in a " + direction + " direction"); //display their chosen move
+                    MovementCalculator(playerList: ref player_data[currentPlayer], roll: diceRoll, movement: direction); //run the movement calculation method 
+                    Console.WriteLine("You are now at X: " + player_data[currentPlayer].xCoordinates + " and Y: " + player_data[currentPlayer].yCoordinates); //display new position
+                    cheeseBoard = CheeseCollector(board: ref cheeseBoard, playerDetails: ref player_data[currentPlayer]); //check if the user landed on any cheese
                 }
 
 
@@ -320,33 +320,33 @@ namespace CheeseMinerBuild1
         }
         static int CheeseHead(player_info[] playerList)
         {
-            string CheeseFace;
+            string CheeseFace; //initialise the method variables
             bool found = false;
             int playerIndex = 0;
 
 
-            do
+            do //make one big outer loop
             {
-                Console.WriteLine("Who has the head which looks most like a block of cheese? ");
-                CheeseFace = Console.ReadLine();
+                Console.WriteLine("Who has the head which looks most like a block of cheese? "); //ask who goes first
+                CheeseFace = Console.ReadLine(); //read in the input
 
-                for (int i = 0; i < playerList.Length; i++)
+                for (int i = 0; i < playerList.Length; i++) //loop through array
                 {
-                    if (playerList[i].playerName.ToLower() == CheeseFace.ToLower())
+                    if (playerList[i].playerName.ToLower() == CheeseFace.ToLower()) //check if the input exists in the array
                     {
-                        playerIndex = i;
-                        found = true;
+                        playerIndex = i; //move it over to our catch variable
+                        found = true; //set found to true
                     }
                 }
 
-                if (found == false)
+                if (found == false) //check if the input was invalid
                 {
-                    Console.WriteLine("Error, player not found! " + Environment.NewLine);
-                    continue;
+                    Console.WriteLine("Error, player not found! " + Environment.NewLine); //throw error
+                    continue; //restart outer loop
                 }
             } while (found == false);
 
-            return playerIndex;
+            return playerIndex; //return the index of the player
         }
         static int RollDice()
         {
@@ -356,25 +356,25 @@ namespace CheeseMinerBuild1
         }
         static char MovementCatcher()
         {
-            char direction = char.Parse("n");
+            char direction = char.Parse("n"); //set our default value to North in case the system fails for some reason
 
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 1; i++) //initialise an outer loop
             {
-                Console.WriteLine("Which direction do you want to move? N, E, S or W? ");
+                Console.WriteLine("Which direction do you want to move? N, E, S or W? "); //print available options
                 try
                 {
-                    direction = char.Parse(Console.ReadLine());
+                    direction = char.Parse(Console.ReadLine()); //attempt to catch input
                 }
-                catch (System.FormatException)
+                catch (System.FormatException) //catch any invalid formats
                 {
-                    Console.WriteLine("Please input a singular character. ");
+                    Console.WriteLine("Please input a singular character. "); //throw an error
                     i = i - 1;
-                    continue;
+                    continue; //restart our loop
                 }
 
-                switch (direction.ToString().ToLower())
+                switch (direction.ToString().ToLower()) //check the data in our valid input
                 {
-                    case "n":
+                    case "n": //if one of our inputs is a valid direction, return it to our main method
                         return direction;
                     case "e":
                         return direction;
@@ -382,48 +382,49 @@ namespace CheeseMinerBuild1
                         return direction;
                     case "w":
                         return direction;
-                    default:
+                    default: //if not
                         break;
                 }
-                i = i - 1;
+                Console.WriteLine("Error, invalid input!" + Environment.NewLine); //throw error
+                i = i - 1; //restart loop
                 continue;
             }
             return direction;
         }
         static void MovementCalculator (ref player_info playerList, int roll, char movement)
         {
-            switch (movement.ToString().ToLower())
+            switch (movement.ToString().ToLower()) //check our movement direction
             {
                 case "u":
-                    playerList.yCoordinates = playerList.yCoordinates + roll;
+                    playerList.yCoordinates = playerList.yCoordinates + roll; //if north, move up by roll amount
 
-                    if (playerList.yCoordinates > 7)
+                    if (playerList.yCoordinates > 7) //if we go off the board
                     {
-                        playerList.yCoordinates = playerList.yCoordinates - 8;
+                        playerList.yCoordinates = playerList.yCoordinates - 8; //wrap around to (y + roll) - 8
                     }
                     break;
-                case "s":
-                    playerList.yCoordinates = playerList.yCoordinates - roll;
+                case "s": //check if we're moving south
+                    playerList.yCoordinates = playerList.yCoordinates - roll; //if so, move down on the y axis by roll
 
                     if (playerList.yCoordinates < 0)
-                    {
-                        playerList.yCoordinates = playerList.yCoordinates + 8;
+                    { 
+                        playerList.yCoordinates = playerList.yCoordinates + 8; //wrap around to (y - roll) + 8 if we go off the board
                     }
                     break;
                 case "e":
-                    playerList.xCoordinates = playerList.xCoordinates + roll;
+                    playerList.xCoordinates = playerList.xCoordinates + roll; //if we go east, move up the x axis by roll
 
                     if (playerList.xCoordinates > 7)
                     {
-                        playerList.xCoordinates = playerList.xCoordinates - 8;
+                        playerList.xCoordinates = playerList.xCoordinates - 8; //wrap to (x + roll) - 8 if we go off the x axis
                     }
                     break;
                 case "w":
-                    playerList.xCoordinates = playerList.xCoordinates - roll;
+                    playerList.xCoordinates = playerList.xCoordinates - roll; //if we move west, go down the x axis by roll amount
 
                     if (playerList.xCoordinates < 0)
                     {
-                        playerList.xCoordinates = playerList.xCoordinates + 8;
+                        playerList.xCoordinates = playerList.xCoordinates + 8; //wrap to (x - roll) + 8 if we fall off the board
                     }
                     break;
             }
@@ -431,19 +432,19 @@ namespace CheeseMinerBuild1
         }
         static bool[,] CheeseCollector(ref bool[,] board, ref player_info playerDetails)
         {
-            if (board[playerDetails.xCoordinates, playerDetails.yCoordinates] == false)
+            if (board[playerDetails.xCoordinates, playerDetails.yCoordinates] == false) //check if we've landed on an empty square
             {
                 Console.WriteLine("There is no cheese on this space.");
-                Console.WriteLine("You do not collect any cheese this turn. ");
-                return board;
+                Console.WriteLine("You do not collect any cheese this turn. "); //tell them it's empty
+                return board; //return an unedited board
             }
-            else
+            else //if there's cheese on this board
             {
-                Console.WriteLine("There is a cheese on this space.");
-                playerDetails.playerStash = playerDetails.playerStash + 1;
-                board[playerDetails.xCoordinates, playerDetails.yCoordinates] = false;
-                Console.WriteLine("You collect the cheese and have a new stash counter of " + playerDetails.playerStash);
-                return board;
+                Console.WriteLine("There is a cheese on this space."); //tell them
+                playerDetails.playerStash = playerDetails.playerStash + 1; //move the player stash up by one
+                board[playerDetails.xCoordinates, playerDetails.yCoordinates] = false; //set the position to empty
+                Console.WriteLine("You collect the cheese and have a new stash counter of " + playerDetails.playerStash); //tell them their new stash amount
+                return board; //return our edited board
             }
         }
     }
