@@ -7,9 +7,11 @@ Implemented in this build:
 - Player selection
 - Cheese placement
 - Methodisation and improvement of system structure
+- Movement System
+- Cheese checker
 
 Next build will implement:
-- Movement system
+- Battle system
 */
 using System;
 using System.Collections.Generic;
@@ -45,9 +47,23 @@ namespace CheeseMinerBuild1
 
             do //begin main execution block of the game
             {
+                int currentPlayer;
+                int winningPlayer;
+                bool gameWon = false;
+
                 cheeseBoard = CheesePlacer(cheesePosition: ref cheeseBoard, playerNumber: playerAmount); //begin method that collects data on where the cheese will be placed
                 player_data = PlayerResetter(playerInfo: ref player_data); //reset the player's position on the board
+                int startingPlayer = CheeseHead(playerList: player_data);
+                currentPlayer = startingPlayer;
 
+                while (gameWon == false)
+                {
+                    Console.WriteLine("Player " + (currentPlayer + 1) + ", " + player_data[currentPlayer].playerName);
+                    Console.WriteLine("You are on X Position: " + player_data[currentPlayer].xCoordinates);
+                    Console.WriteLine("You are on Y Position: " + player_data[currentPlayer].yCoordinates);
+                    int diceRoll = RollDice();
+                    Console.WriteLine("You rolled a " + diceRoll);
+                }
 
                 Console.WriteLine("Do you wish to end the game? [Y]es or [N]o"); //get input if the user wants to end the session
                 finalInput = Console.ReadLine();
@@ -295,6 +311,43 @@ namespace CheeseMinerBuild1
             }
             return playerInfo;
         }
+        static int CheeseHead(player_info[] playerList)
+        {
+            string CheeseFace;
+            bool found = false;
+            int playerIndex = 0;
+
+
+            do
+            {
+                Console.WriteLine("Who has the head which looks most like a block of cheese? ");
+                CheeseFace = Console.ReadLine();
+
+                for (int i = 0; i < playerList.Length; i++)
+                {
+                    if (playerList[i].playerName.ToLower() == CheeseFace.ToLower())
+                    {
+                        playerIndex = i;
+                        found = true;
+                    }
+                }
+
+                if (found == false)
+                {
+                    Console.WriteLine("Error, player not found! " + Environment.NewLine);
+                    continue;
+                }
+            } while (found == false);
+
+            return playerIndex;
+        }
+        static int RollDice()
+        {
+            Console.WriteLine("Input your dice roll: ");
+            int diceRoll = int.Parse(Console.ReadLine());
+            return diceRoll; 
+        }
+
     }
 }
 
