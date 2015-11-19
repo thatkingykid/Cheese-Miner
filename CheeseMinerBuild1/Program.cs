@@ -55,6 +55,7 @@ namespace CheeseMinerBuild1
                 player_data = PlayerResetter(playerInfo: ref player_data); //reset the player's position on the board
                 int startingPlayer = CheeseHead(playerList: player_data);
                 currentPlayer = startingPlayer;
+                char direction;
 
                 while (gameWon == false)
                 {
@@ -63,7 +64,11 @@ namespace CheeseMinerBuild1
                     Console.WriteLine("You are on Y Position: " + player_data[currentPlayer].yCoordinates);
                     int diceRoll = RollDice();
                     Console.WriteLine("You rolled a " + diceRoll);
+                    direction = MovementCatcher();
+                    Console.WriteLine("You are moving " + diceRoll + " spaces in a " + direction + " direction");
+                    MovementCalculator(playerList: ref player_data, index: currentPlayer, roll: diceRoll, movement: direction);
                 }
+
 
                 Console.WriteLine("Do you wish to end the game? [Y]es or [N]o"); //get input if the user wants to end the session
                 finalInput = Console.ReadLine();
@@ -345,9 +350,48 @@ namespace CheeseMinerBuild1
         {
             Console.WriteLine("Input your dice roll: ");
             int diceRoll = int.Parse(Console.ReadLine());
-            return diceRoll; 
+            return diceRoll;
         }
+        static char MovementCatcher()
+        {
+            char direction = char.Parse("n");
 
+            for (int i = 0; i < 1; i++)
+            {
+                Console.WriteLine("Which direction do you want to move? N, E, S or W? ");
+                try
+                {
+                    direction = char.Parse(Console.ReadLine());
+                }
+                catch (System.FormatException)
+                {
+                    Console.WriteLine("Please input a singular character. ");
+                    i = i - 1;
+                    continue;
+                }
+
+                switch (direction.ToString().ToLower())
+                {
+                    case "n":
+                        return direction;
+                    case "e":
+                        return direction;
+                    case "s":
+                        return direction;
+                    case "w":
+                        return direction;
+                    default:
+                        break;
+                }
+                i = i - 1;
+                continue;
+            }
+            return direction;
+        }
+        static void MovementCalculator (ref player_info[] playerList, int index, int roll, char movement)
+        {
+            switch 
+        }
     }
 }
 
