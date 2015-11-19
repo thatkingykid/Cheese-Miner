@@ -66,7 +66,9 @@ namespace CheeseMinerBuild1
                     Console.WriteLine("You rolled a " + diceRoll);
                     direction = MovementCatcher();
                     Console.WriteLine("You are moving " + diceRoll + " spaces in a " + direction + " direction");
-                    MovementCalculator(playerList: ref player_data, index: currentPlayer, roll: diceRoll, movement: direction);
+                    MovementCalculator(playerList: ref player_data[currentPlayer], roll: diceRoll, movement: direction);
+                    Console.WriteLine("You are now at X: " + player_data[currentPlayer].xCoordinates + " and Y: " + player_data[currentPlayer].yCoordinates);
+                    cheeseBoard = CheeseCollector(board: ref cheeseBoard, playerDetails: ref player_data[currentPlayer]);
                 }
 
 
@@ -212,7 +214,7 @@ namespace CheeseMinerBuild1
                         continue;
                     }
 
-                    if (cheeseCatcherX > 8 || cheeseCatcherX < 0) //check it is a position on the board
+                    if (cheeseCatcherX > 7 || cheeseCatcherX < 0) //check it is a position on the board
                     {
                         Console.WriteLine("Space is infinite, unlike our board, please input a value between 0 and 8.", Environment.NewLine);
                         j = j - 1; //restart if not
@@ -230,7 +232,7 @@ namespace CheeseMinerBuild1
                         continue;
                     }
 
-                    if (cheeseCatcherY > 8 || cheeseCatcherY < 0) //check if it isn't a position on the board
+                    if (cheeseCatcherY > 7 || cheeseCatcherY < 0) //check if it isn't a position on the board
                     {
                         Console.WriteLine("Space is infinite, unlike our board, please input a value between 0 and 8.", Environment.NewLine);
                         j = j - 1;
@@ -388,9 +390,61 @@ namespace CheeseMinerBuild1
             }
             return direction;
         }
-        static void MovementCalculator (ref player_info[] playerList, int index, int roll, char movement)
+        static void MovementCalculator (ref player_info playerList, int roll, char movement)
         {
-            switch 
+            switch (movement.ToString().ToLower())
+            {
+                case "u":
+                    playerList.yCoordinates = playerList.yCoordinates + roll;
+
+                    if (playerList.yCoordinates > 7)
+                    {
+                        playerList.yCoordinates = playerList.yCoordinates - 8;
+                    }
+                    break;
+                case "s":
+                    playerList.yCoordinates = playerList.yCoordinates - roll;
+
+                    if (playerList.yCoordinates < 0)
+                    {
+                        playerList.yCoordinates = playerList.yCoordinates + 8;
+                    }
+                    break;
+                case "e":
+                    playerList.xCoordinates = playerList.xCoordinates + roll;
+
+                    if (playerList.xCoordinates > 7)
+                    {
+                        playerList.xCoordinates = playerList.xCoordinates - 8;
+                    }
+                    break;
+                case "w":
+                    playerList.xCoordinates = playerList.xCoordinates - roll;
+
+                    if (playerList.xCoordinates < 0)
+                    {
+                        playerList.xCoordinates = playerList.xCoordinates + 8;
+                    }
+                    break;
+            }
+
+        }
+        static bool[,] CheeseCollector(ref bool[,] board, ref player_info playerDetails)
+        {
+            if (board[playerDetails.xCoordinates, playerDetails.yCoordinates] == false)
+            {
+                Console.WriteLine("There is no cheese on this space.");
+                Console.WriteLine("You do not collect any cheese this turn. ");
+                return board;
+            }
+            else
+            {
+                Console.WriteLine("There is a cheese on this space.");
+                playerDetails.playerStash = playerDetails.playerStash + 1;
+                board[playerDetails.xCoordinates, playerDetails.yCoordinates] = false;
+                Console.WriteLine("You collect the cheese and have a new stash counter of " + playerDetails.playerStash);
+                return board;
+            }
         }
     }
 }
