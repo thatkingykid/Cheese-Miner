@@ -1,5 +1,5 @@
 ﻿/*
-Space Cheese Mining v0.2
+Space Cheese Mining v0.2.5
 James King
 08101
 
@@ -9,9 +9,10 @@ Implemented in this build:
 - Methodisation and improvement of system structure
 - Movement System
 - Cheese checker
+- Battle system
 
 Next build will implement:
-- Battle system
+- Scoring the game
 */
 using System;
 using System.Collections.Generic;
@@ -59,6 +60,9 @@ namespace CheeseMinerBuild1
 
                 while (gameWon == false)
                 {
+                    int collisionIndex = 0;
+                    char battleDecision = char.Parse("n");
+
                     Console.WriteLine("Player " + (currentPlayer + 1) + ", " + player_data[currentPlayer].playerName);
                     Console.WriteLine("You are on X Position: " + player_data[currentPlayer].xCoordinates);
                     Console.WriteLine("You are on Y Position: " + player_data[currentPlayer].yCoordinates);
@@ -69,6 +73,17 @@ namespace CheeseMinerBuild1
                     MovementCalculator(playerList: ref player_data[currentPlayer], roll: diceRoll, movement: direction); //run the movement calculation method 
                     Console.WriteLine("You are now at X: " + player_data[currentPlayer].xCoordinates + " and Y: " + player_data[currentPlayer].yCoordinates); //display new position
                     cheeseBoard = CheeseCollector(board: ref cheeseBoard, playerDetails: ref player_data[currentPlayer]); //check if the user landed on any cheese
+                    bool collision = CollisionDetector(playerList: player_data, currentIndex: currentPlayer, detectedPlayer: ref collisionIndex); //run the method which checks for player collision
+
+                    if (collision == true) //check if we had a collision
+                    {
+                        battleDecision = BattleDecisionMaker(opponentPlayer: collisionIndex); //if so, run the method which gets user input if they want to battle
+                    }
+
+                    if (battleDecision.ToString().ToLower() == "y") //check the user wants to battle
+                    {
+
+                    }
                 }
 
 
@@ -446,6 +461,47 @@ namespace CheeseMinerBuild1
                 Console.WriteLine("You collect the cheese and have a new stash counter of " + playerDetails.playerStash); //tell them their new stash amount
                 return board; //return our edited board
             }
+        }
+        static bool CollisionDetector(player_info[] playerList, int currentIndex, ref int detectedPlayer)
+        {
+            for (int i = 0; i < playerList.Length; i++) //loop through our array
+            {
+                if (i == currentIndex) //check we're not on the current player
+                {
+                    continue; //if so, skip this iteration
+                }
+                else
+                {
+                    if (playerList[i].xCoordinates == playerList[currentIndex].xCoordinates) //check the x co-ordinates between the two players match
+                    {
+                        if (playerList[i].yCoordinates == playerList[currentIndex].yCoordinates) //if so, check that the y co-ordinates match
+                        {
+                            detectedPlayer = i; //if so, move our loop iteration into a variable
+                            return true; //return the fact we have a collision
+                        }
+                    }
+                }
+            }
+            return false; //return that there were no collisions
+        }
+        static char BattleDecisionMaker(int opponentPlayer)
+        {
+            char decision = char.Parse("n"); //initalise our variable with a default value
+            do //intialise a big outer loop to get a valid input
+            {
+                Console.WriteLine("Do you wish to perform battle with Player " + (opponentPlayer + 1) + " Y or N? "); //ask player if they wish to do battle
+                try
+                {
+                    decision = char.Parse(Console.ReadLine()); //attempt to catch an input
+                }
+                catch (System.FormatException)
+                {
+                    Console.WriteLine("Invalid input, please try again! " + Environment.NewLine); //throw an error and restart if their input is invalid
+                    continue;
+                }
+            }
+            while (decision.ToString().ToLower() != "n" || decision.ToString().ToLower() != "y"); //only break when our input is valid
+            return decision; //return our input
         }
     }
 }
