@@ -60,8 +60,9 @@ namespace CheeseMinerBuild1
 
                 while (gameWon == false)
                 {
-                    int collisionIndex = 0;
+                    List<int> collisionIndex = new List<int>();
                     char battleDecision = char.Parse("n");
+                    int targetPlayer = 0;
 
                     Console.WriteLine("Player " + (currentPlayer + 1) + ", " + player_data[currentPlayer].playerName);
                     Console.WriteLine("You are on X Position: " + player_data[currentPlayer].xCoordinates);
@@ -77,7 +78,7 @@ namespace CheeseMinerBuild1
 
                     if (collision == true) //check if we had a collision
                     {
-                        battleDecision = BattleDecisionMaker(opponentPlayer: collisionIndex); //if so, run the method which gets user input if they want to battle
+                        battleDecision = BattleDecisionMaker(opponentPlayer: collisionIndex, finalTarget: targetPlayer); //if so, run the method which gets user input if they want to battle
                     }
 
                     if (battleDecision.ToString().ToLower() == "y") //check the user wants to battle
@@ -462,7 +463,7 @@ namespace CheeseMinerBuild1
                 return board; //return our edited board
             }
         }
-        static bool CollisionDetector(player_info[] playerList, int currentIndex, ref int detectedPlayer)
+        static bool CollisionDetector(player_info[] playerList, int currentIndex, ref List<int> detectedPlayer)
         {
             for (int i = 0; i < playerList.Length; i++) //loop through our array
             {
@@ -476,32 +477,114 @@ namespace CheeseMinerBuild1
                     {
                         if (playerList[i].yCoordinates == playerList[currentIndex].yCoordinates) //if so, check that the y co-ordinates match
                         {
-                            detectedPlayer = i; //if so, move our loop iteration into a variable
-                            return true; //return the fact we have a collision
+                            detectedPlayer.Add(i); //if so, move our loop iteration into our list
                         }
                     }
                 }
             }
-            return false; //return that there were no collisions
+
+            if (detectedPlayer.Count == 0)
+            {
+                return false; //return that there were no collisions
+            }
+            else
+            {
+                return true;
+            }
         }
-        static char BattleDecisionMaker(int opponentPlayer)
+        static char BattleDecisionMaker(List<int> opponentPlayer, int finalTarget)
         {
             char decision = char.Parse("n"); //initalise our variable with a default value
             do //intialise a big outer loop to get a valid input
             {
-                Console.WriteLine("Do you wish to perform battle with Player " + (opponentPlayer + 1) + " Y or N? "); //ask player if they wish to do battle
-                try
+                if (opponentPlayer.Count == 1)
                 {
-                    decision = char.Parse(Console.ReadLine()); //attempt to catch an input
+                    Console.WriteLine("Do you wish to perform battle with Player " + opponentPlayer[0] + " Y or N? "); //ask player if they wish to do battle
+                    try
+                    {
+                        decision = char.Parse(Console.ReadLine()); //attempt to catch an input
+                    }
+                    catch (System.FormatException)
+                    {
+                        Console.WriteLine("Invalid input, please try again! " + Environment.NewLine); //throw an error and restart if their input is invalid
+                        continue;
+                    }
                 }
-                catch (System.FormatException)
+                else
                 {
-                    Console.WriteLine("Invalid input, please try again! " + Environment.NewLine); //throw an error and restart if their input is invalid
-                    continue;
+                    Console.WriteLine("There are " + (opponentPlayer.Count + 1) + " players to battle.");
+                    Console.Write("Please pick from Players: ");
+                    for (int i = 0; i < opponentPlayer.Count; i++)
+                    {
+                        Console.Write(opponentPlayer[i] + 1);
+                        Console.Write(", ");
+                    }
+                    try
+                    {
+                        finalTarget = int.Parse(Console.ReadLine());
+                    }
+                    catch (System.FormatException)
+                    {
+                        Console.WriteLine("Invalid input, please try again! " + Environment.NewLine);
+                        continue;
+                    }
+                    bool broken = false;
+
+                    for (int i = 0; i < opponentPlayer.Count; i++)
+                    {
+                        if (finalTarget == opponentPlayer[i])
+                        {
+                            broken = true;
+                        }
+                    }
+
+                    if (broken == false)
+                    {
+                        Console.WriteLine("Player selected is invalid, please try again! " + Environment.NewLine);
+                    }
+
+                    Console.WriteLine("Are you sure you wish to do battle with Player " + (finalTarget + 1) + "?");
+                    try
+                    {
+                        decision = char.Parse(Console.ReadLine()); //attempt to catch an input
+                    }
+                    catch (System.FormatException)
+                    {
+                        Console.WriteLine("Invalid input, please try again! " + Environment.NewLine); //throw an error and restart if their input is invalid
+                        continue;
+                    }
                 }
             }
             while (decision.ToString().ToLower() != "n" || decision.ToString().ToLower() != "y"); //only break when our input is valid
             return decision; //return our input
+        }
+        static int BattleSystem(player_info[] playerData, int activePlayer, int targetPlayer)
+        {
+            bool lostBattle;
+            int activeRoll = RollDice();
+            Console.WriteLine("Player " + (activePlayer + 1) + " rolled a " + activeRoll);
+            int targetRoll = RollDice();
+            Console.WriteLine("Player " + (targetPlayer + 1) + " rolled a " + targetRoll);
+        }
+        static int BattleLogic(int playerRoll, int opponentRoll, player_info[] playerDetails, int activeUser, int targetUser, bool larger)
+        {
+            int rollDifference;
+
+            if (playerRoll < opponentRoll)
+            {
+                larger = true;
+            }
+
+            if (larger == true)
+            {
+                rollDifference = opponentRoll - playerRoll;
+            }
+            else
+            {
+                rollDifference = playerRoll - opponentRoll;
+            }
+
+
         }
     }
 }
