@@ -83,7 +83,7 @@ namespace CheeseMinerBuild1
 
                     if (battleDecision.ToString().ToLower() == "y") //check the user wants to battle
                     {
-
+                        BattleSystem(playerData: ref player_data, activePlayer: currentPlayer, targetPlayer: targetPlayer, cheeseData: ref cheeseBoard);
                     }
                 }
 
@@ -303,34 +303,43 @@ namespace CheeseMinerBuild1
             {
                 playerInfo[0].xCoordinates = 0;
                 playerInfo[0].yCoordinates = 0;
+                playerInfo[0].playerStash = 0;
                 //place them at opposite board ends
                 playerInfo[1].xCoordinates = 7;
                 playerInfo[1].yCoordinates = 7;
+                playerInfo[1].playerStash = 0;
             }
             else if (playerInfo.Length == 3) //check if we have 3 players
             {
                 playerInfo[0].xCoordinates = 0;
                 playerInfo[0].yCoordinates = 0;
+                playerInfo[0].playerStash = 0;
                 //place them in an L shape across the board
                 playerInfo[1].xCoordinates = 7;
                 playerInfo[1].yCoordinates = 0;
+                playerInfo[1].playerStash = 0;
 
                 playerInfo[2].xCoordinates = 0;
                 playerInfo[2].yCoordinates = 7;
+                playerInfo[2].playerStash = 0;
             }
             else
             {
                 playerInfo[0].xCoordinates = 0;
                 playerInfo[0].yCoordinates = 0;
+                playerInfo[0].playerStash = 0;
                 //place all four players in the corners of the board
                 playerInfo[1].xCoordinates = 7;
                 playerInfo[1].yCoordinates = 0;
+                playerInfo[1].playerStash = 0;
 
                 playerInfo[2].xCoordinates = 0;
                 playerInfo[2].yCoordinates = 7;
+                playerInfo[2].playerStash = 0;
 
-                playerInfo[2].xCoordinates = 7;
-                playerInfo[2].yCoordinates = 7;
+                playerInfo[3].xCoordinates = 7;
+                playerInfo[3].yCoordinates = 7;
+                playerInfo[3].playerStash = 0;
             }
             return playerInfo;
         }
@@ -558,17 +567,466 @@ namespace CheeseMinerBuild1
             while (decision.ToString().ToLower() != "n" || decision.ToString().ToLower() != "y"); //only break when our input is valid
             return decision; //return our input
         }
-        static int BattleSystem(player_info[] playerData, int activePlayer, int targetPlayer)
+        static void BattleSystem(ref player_info[] playerData, int activePlayer, int targetPlayer, ref bool[,]cheeseData)
         {
-            bool lostBattle;
+            bool lostBattle = false;
+            int cheeseChange;
             int activeRoll = RollDice();
             Console.WriteLine("Player " + (activePlayer + 1) + " rolled a " + activeRoll);
             int targetRoll = RollDice();
             Console.WriteLine("Player " + (targetPlayer + 1) + " rolled a " + targetRoll);
+            cheeseChange = BattleLogic(playerRoll: activeRoll, opponentRoll: targetRoll, larger: ref lostBattle);
+            
+            switch (cheeseChange)
+            {
+                case -2:
+                    {
+                        Console.WriteLine("Poor win! Surrender a cheese to your target!");
+                        if (playerData[activePlayer].playerStash == 0)
+                        {
+                            Console.WriteLine("No cheese to be given! You escape this time!");
+                            break;
+                        }
+                        else
+                        {
+                            playerData[activePlayer].playerStash--;
+                            playerData[targetPlayer].playerStash++;
+                            Console.WriteLine("Player " + (activePlayer + 1) + "'s new stash amount: " + playerData[activePlayer].playerStash);
+                            Console.WriteLine("Player " + (targetPlayer + 1) + "'s new stash amount: " + playerData[targetPlayer].playerStash);
+                            break;
+                        }
+                    }
+                case -1:
+                    {
+                        int selectedMove;
+
+                        Console.WriteLine("Honorable defeat! Player " + (targetPlayer + 1) + " must move to any of these adjacent spaces:");
+                        Console.WriteLine("1. " + (playerData[targetPlayer].xCoordinates) + ", " + (playerData[targetPlayer].yCoordinates + 1));
+                        Console.WriteLine("2. " + (playerData[targetPlayer].xCoordinates) + ", " + (playerData[targetPlayer].yCoordinates - 1));
+                        Console.WriteLine("3. " + (playerData[targetPlayer].xCoordinates + 1) + ", " + (playerData[targetPlayer].yCoordinates));
+                        Console.WriteLine("4. " + (playerData[targetPlayer].xCoordinates - 1) + ", " + (playerData[targetPlayer].yCoordinates));
+                        for (int i = 0; i < 1; i++)
+                        {
+                            Console.WriteLine("Please select move 1, 2, 3 or 4");
+                            try
+                            {
+                                selectedMove = int.Parse(Console.ReadLine());
+                            }
+                            catch (System.FormatException)
+                            {
+                                Console.WriteLine("Invalid format, please try again! " + Environment.NewLine);
+                                i--;
+                                continue;
+                            }
+                            if (selectedMove == 1)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: targetPlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[targetPlayer].yCoordinates++;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 2)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: targetPlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[targetPlayer].yCoordinates--;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 3)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: targetPlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[targetPlayer].xCoordinates++;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 4)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: targetPlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[targetPlayer].xCoordinates--;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid move selected! Please try again!" + Environment.NewLine);
+                                i--;
+                                continue;
+                            }
+                        }
+                        cheeseData = CheeseCollector(board: ref cheeseData, playerDetails: ref playerData[targetPlayer]);
+                        break;
+                    }
+                case 0:
+                    {
+                        int selectedMove;
+
+                        Console.WriteLine("Solid victory! Player " + (activePlayer + 1) + " must move to any of these adjacent spaces:");
+                        Console.WriteLine("1. " + (playerData[activePlayer].xCoordinates) + ", " + (playerData[activePlayer].yCoordinates + 1));
+                        Console.WriteLine("2. " + (playerData[activePlayer].xCoordinates) + ", " + (playerData[activePlayer].yCoordinates - 1));
+                        Console.WriteLine("3. " + (playerData[activePlayer].xCoordinates + 1) + ", " + (playerData[activePlayer].yCoordinates));
+                        Console.WriteLine("4. " + (playerData[activePlayer].xCoordinates - 1) + ", " + (playerData[activePlayer].yCoordinates));
+                        for (int i = 0; i < 1; i++)
+                        {
+                            Console.WriteLine("Please select move 1, 2, 3 or 4");
+                            try
+                            {
+                                selectedMove = int.Parse(Console.ReadLine());
+                            }
+                            catch (System.FormatException)
+                            {
+                                Console.WriteLine("Invalid format, please try again! " + Environment.NewLine);
+                                i--;
+                                continue;
+                            }
+                            if (selectedMove == 1)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].yCoordinates++;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 2)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].yCoordinates--;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 3)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].xCoordinates++;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 4)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].xCoordinates--;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid move selected! Please try again!" + Environment.NewLine);
+                                i--;
+                                continue;
+                            }
+                        }
+                        cheeseData = CheeseCollector(board: ref cheeseData, playerDetails: ref playerData[activePlayer]);
+                        break;
+                    }
+                case 1:
+                    {
+                        int selectedMove;
+
+                        Console.WriteLine("Glorious victory!");
+                        if (playerData[targetPlayer].playerStash < 1)
+                        {
+                            Console.WriteLine("Player " + (targetPlayer + 1) + " is unable to give you any cheese, he escapes this time!");
+                        }
+                        else
+                        {
+                            playerData[activePlayer].playerStash++;
+                            playerData[targetPlayer].playerStash--;
+                            Console.WriteLine("Player " + (activePlayer + 1) + "'s new stash amount: " + playerData[activePlayer].playerStash);
+                            Console.WriteLine("Player " + (targetPlayer + 1) + "'s new stash amount: " + playerData[targetPlayer].playerStash);
+                        }
+                        Console.WriteLine("Now Player " + (activePlayer + 1) + "must move to any of these co-ordinates: ");
+                        Console.WriteLine("1. " + (playerData[activePlayer].xCoordinates) + ", " + (playerData[activePlayer].yCoordinates + 1));
+                        Console.WriteLine("2. " + (playerData[activePlayer].xCoordinates) + ", " + (playerData[activePlayer].yCoordinates - 1));
+                        Console.WriteLine("3. " + (playerData[activePlayer].xCoordinates + 1) + ", " + (playerData[activePlayer].yCoordinates));
+                        Console.WriteLine("4. " + (playerData[activePlayer].xCoordinates - 1) + ", " + (playerData[activePlayer].yCoordinates));
+                        for (int i = 0; i < 1; i++)
+                        {
+                            Console.WriteLine("Please select move 1, 2, 3 or 4");
+                            try
+                            {
+                                selectedMove = int.Parse(Console.ReadLine());
+                            }
+                            catch (System.FormatException)
+                            {
+                                Console.WriteLine("Invalid format, please try again! " + Environment.NewLine);
+                                i--;
+                                continue;
+                            }
+                            if (selectedMove == 1)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].yCoordinates++;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 2)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].yCoordinates--;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 3)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].xCoordinates++;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 4)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].xCoordinates--;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid move selected! Please try again!" + Environment.NewLine);
+                                i--;
+                                continue;
+                            }
+                        }
+                        cheeseData = CheeseCollector(board: ref cheeseData, playerDetails: ref playerData[activePlayer]);
+                        break;
+                    }
+                case 2:
+                    {
+                        int selectedMove;
+
+                        Console.WriteLine("Infamous victory!");
+                        if (playerData[targetPlayer].playerStash < 2)
+                        {
+                            Console.WriteLine("Player " + (targetPlayer + 1) + " is unable to give you any cheese, he escapes this time!");
+                        }
+                        else
+                        {
+                            playerData[activePlayer].playerStash = playerData[activePlayer].playerStash + 2;
+                            playerData[targetPlayer].playerStash = playerData[targetPlayer].playerStash - 2;
+                            Console.WriteLine("Player " + (activePlayer + 1) + "'s new stash amount: " + playerData[activePlayer].playerStash);
+                            Console.WriteLine("Player " + (targetPlayer + 1) + "'s new stash amount: " + playerData[targetPlayer].playerStash);
+                        }
+                        Console.WriteLine("Now Player " + (activePlayer + 1) + "must move to any of these co-ordinates: ");
+                        Console.WriteLine("1. " + (playerData[activePlayer].xCoordinates) + ", " + (playerData[activePlayer].yCoordinates + 1));
+                        Console.WriteLine("2. " + (playerData[activePlayer].xCoordinates) + ", " + (playerData[activePlayer].yCoordinates - 1));
+                        Console.WriteLine("3. " + (playerData[activePlayer].xCoordinates + 1) + ", " + (playerData[activePlayer].yCoordinates));
+                        Console.WriteLine("4. " + (playerData[activePlayer].xCoordinates - 1) + ", " + (playerData[activePlayer].yCoordinates));
+                        for (int i = 0; i < 1; i++)
+                        {
+                            Console.WriteLine("Please select move 1, 2, 3 or 4");
+                            try
+                            {
+                                selectedMove = int.Parse(Console.ReadLine());
+                            }
+                            catch (System.FormatException)
+                            {
+                                Console.WriteLine("Invalid format, please try again! " + Environment.NewLine);
+                                i--;
+                                continue;
+                            }
+                            if (selectedMove == 1)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].yCoordinates++;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 2)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].yCoordinates--;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 3)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].xCoordinates++;
+                                    break;
+                                }
+                            }
+                            else if (selectedMove == 4)
+                            {
+                                bool occupied = false;
+                                List<int> playersOccupying = new List<int>();
+                                occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
+                                if (occupied == true)
+                                {
+                                    Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    playerData[activePlayer].xCoordinates--;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid move selected! Please try again!" + Environment.NewLine);
+                                i--;
+                                continue;
+                            }
+                        }
+                        cheeseData = CheeseCollector(board: ref cheeseData, playerDetails: ref playerData[activePlayer]);
+                        break;
+                    }
+            }
+
         }
-        static int BattleLogic(int playerRoll, int opponentRoll, player_info[] playerDetails, int activeUser, int targetUser, bool larger)
+        static int BattleLogic(int playerRoll, int opponentRoll, ref bool larger)
         {
             int rollDifference;
+            int score = 0;
 
             if (playerRoll < opponentRoll)
             {
@@ -584,7 +1042,25 @@ namespace CheeseMinerBuild1
                 rollDifference = playerRoll - opponentRoll;
             }
 
-
+            switch (rollDifference)
+            {
+                case 2:
+                    score = -2;
+                    break;
+                case 3:
+                    score = -1;
+                    break;
+                case 4:
+                    score = 0;
+                    break;
+                case 5:
+                    score = 1;
+                    break;
+                case 6:
+                    score = 2;
+                    break;
+            }
+            return score;
         }
     }
 }
