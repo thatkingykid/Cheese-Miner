@@ -94,7 +94,7 @@ namespace CheeseMinerBuild1
                         }
                         gameWon = FindAWinner(playerList: player_data, winnerIndex: ref winningPlayer); //run the method that checks if anyone has won the game
 
-                        if (currentPlayer == playerAmount) //checks if we're on the last player in the index
+                        if (currentPlayer == playerAmount - 1) //checks if we're on the last player in the index
                         {
                             currentPlayer = 0; //if so, restart our loop
                         }
@@ -487,7 +487,7 @@ namespace CheeseMinerBuild1
         {
             switch (movement.ToString().ToLower()) //check our movement direction
             {
-                case "u":
+                case "n":
                     playerList.yCoordinates = playerList.yCoordinates + roll; //if north, move up by roll amount
 
                     if (playerList.yCoordinates > 7) //if we go off the board
@@ -646,6 +646,12 @@ namespace CheeseMinerBuild1
             int targetRoll = RollDice(); //target rolls the dice
             Console.WriteLine("Player " + (targetPlayer + 1) + " rolled a " + targetRoll);
             cheeseChange = BattleLogic(playerRoll: activeRoll, opponentRoll: targetRoll, larger: ref lostBattle); //run the method which runs through the logic of the battle
+            if (lostBattle == true) //if the player lost the battle, switch over the victor in the decision making
+            {
+                int temp = activePlayer;
+                activePlayer = targetPlayer;
+                targetPlayer = temp;
+            }
 
             switch (cheeseChange)
             {
@@ -659,8 +665,8 @@ namespace CheeseMinerBuild1
                         }
                         else
                         { //if so, fork over cheese
-                            playerData[activePlayer].playerStash--;
-                            playerData[targetPlayer].playerStash++;
+                            playerData[activePlayer].playerStash = playerData[activePlayer].playerStash - 1;
+                            playerData[targetPlayer].playerStash = playerData[targetPlayer] + 1;
                             Console.WriteLine("Player " + (activePlayer + 1) + "'s new stash amount: " + playerData[activePlayer].playerStash);
                             Console.WriteLine("Player " + (targetPlayer + 1) + "'s new stash amount: " + playerData[targetPlayer].playerStash); //print new stash amounts
                             break; //exit out of the switch
@@ -1120,6 +1126,12 @@ namespace CheeseMinerBuild1
             int targetRoll = ReadDice(); //target rolls the dice
             Console.WriteLine("Player " + (targetPlayer + 1) + " rolled a " + targetRoll);
             cheeseChange = BattleLogic(playerRoll: activeRoll, opponentRoll: targetRoll, larger: ref lostBattle); //run the method which runs through the logic of the battle
+            if (lostBattle == true) //if the player lost the battle, switch over the victor in the decision making
+            {
+                int temp = activePlayer;
+                activePlayer = targetPlayer;
+                targetPlayer = temp;
+            }
 
             switch (cheeseChange)
             {
@@ -1133,8 +1145,8 @@ namespace CheeseMinerBuild1
                         }
                         else
                         { //if so, fork over cheese
-                            playerData[activePlayer].playerStash--;
-                            playerData[targetPlayer].playerStash++;
+                            playerData[activePlayer].playerStash = playerData[activePlayer].playerStash - 1;
+                            playerData[targetPlayer].playerStash = playerData[targetPlayer] + 1;
                             Console.WriteLine("Player " + (activePlayer + 1) + "'s new stash amount: " + playerData[activePlayer].playerStash);
                             Console.WriteLine("Player " + (targetPlayer + 1) + "'s new stash amount: " + playerData[targetPlayer].playerStash); //print new stash amounts
                             break; //exit out of the switch
