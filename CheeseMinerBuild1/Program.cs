@@ -135,7 +135,7 @@ namespace CheeseMinerBuild1
                         }
                         gameWon = FindAWinner(playerList: player_data, winnerIndex: ref winningPlayer); //run the method that checks if anyone has won the game
 
-                        if (currentPlayer == playerAmount) //checks if we're on the last player in the index
+                        if (currentPlayer == playerAmount - 1) //checks if we're on the last player in the index
                         {
                             currentPlayer = 0; //if so, restart our loop
                         }
@@ -570,12 +570,12 @@ namespace CheeseMinerBuild1
         }
         static char BattleDecisionMaker(List<int> opponentPlayer, int finalTarget)
         {
-            char decision = char.Parse("n"); //initalise our variable with a default value
+            char decision = char.Parse("u"); //initalise our variable with a default value
             do //intialise a big outer loop to get a valid input
             {
                 if (opponentPlayer.Count == 1)
                 {
-                    Console.WriteLine("Do you wish to perform battle with Player " + opponentPlayer[0] + " Y or N? "); //ask player if they wish to do battle
+                    Console.WriteLine("Do you wish to perform battle with Player " + (opponentPlayer[0] + 1) + " Y or N? "); //ask player if they wish to do battle
                     try
                     {
                         decision = char.Parse(Console.ReadLine()); //attempt to catch an input
@@ -604,6 +604,7 @@ namespace CheeseMinerBuild1
                         Console.WriteLine("Invalid input, please try again! " + Environment.NewLine);
                         continue; //restart the chunk if the input is invalid
                     }
+                    finalTarget--; //take one off so we have the actual user they wish to battle
                     bool broken = false; //set the variable that checks if we've broken out of the loop to false
 
                     for (int i = 0; i < opponentPlayer.Count; i++)
