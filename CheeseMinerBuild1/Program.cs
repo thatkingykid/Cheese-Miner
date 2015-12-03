@@ -13,8 +13,7 @@ Implemented in this build:
 - Scoring the game
 - Bug squashing
 
-Next build will implement:
-- Hours of sanity lost
+
 */
 using System;
 using System.Collections.Generic;
@@ -166,7 +165,7 @@ namespace CheeseMinerBuild1
                 {
                     numberOfPlayers = int.Parse(Console.ReadLine());
                 }
-                catch (System.FormatException) //when a user cocks up, do this to stop the system from crashing
+                catch (System.FormatException) //when a user inputs an incorrect data, do this to stop the system from crashing
                 {
                     Console.WriteLine("That's not a number!"); //throw error
                     Console.WriteLine(Environment.NewLine); //render a new line
@@ -176,23 +175,23 @@ namespace CheeseMinerBuild1
 
                 if (numberOfPlayers < 0) //check user hasn't entered a negative value
                 {
-                    Console.WriteLine("Either you've entered an alternate dimension,", Environment.NewLine, "where man can exist in negative form, or you're trying to break the system.", Environment.NewLine);
+                    Console.WriteLine("Please input a number between 2 and 4!" + Environment.NewLine);
                     continue;
                 }
                 else if (numberOfPlayers == 0) //check user hasn't set input to 0
                 {
-                    Console.WriteLine("Sadly, you can't play this with no one. " + Environment.NewLine);
+                    Console.WriteLine("Please input a number between 2 and 4!" + Environment.NewLine);
                     continue;
                 }
                 else if (numberOfPlayers == 1) //check user hasn't set input to 1
                 {
-                    Console.WriteLine("Ah yes, the lonely nights spent playing cheese miner with youself.");
+                    Console.WriteLine("Please input a number between 2 and 4!");
                     Console.WriteLine(Environment.NewLine);
                     continue;
                 }
                 else if (numberOfPlayers > 4) //check there aren't too many players
                 {
-                    Console.WriteLine("Though time is infinite, sadly RAM is not, please select 4 or less players.", Environment.NewLine);
+                    Console.WriteLine("Please input a number between 2 and 4!", Environment.NewLine);
                     continue;
                 }
                 else
@@ -666,7 +665,7 @@ namespace CheeseMinerBuild1
                         else
                         { //if so, fork over cheese
                             playerData[activePlayer].playerStash = playerData[activePlayer].playerStash - 1;
-                            playerData[targetPlayer].playerStash = playerData[targetPlayer] + 1;
+                            playerData[targetPlayer].playerStash = playerData[targetPlayer].playerStash + 1;
                             Console.WriteLine("Player " + (activePlayer + 1) + "'s new stash amount: " + playerData[activePlayer].playerStash);
                             Console.WriteLine("Player " + (targetPlayer + 1) + "'s new stash amount: " + playerData[targetPlayer].playerStash); //print new stash amounts
                             break; //exit out of the switch
@@ -1146,7 +1145,7 @@ namespace CheeseMinerBuild1
                         else
                         { //if so, fork over cheese
                             playerData[activePlayer].playerStash = playerData[activePlayer].playerStash - 1;
-                            playerData[targetPlayer].playerStash = playerData[targetPlayer] + 1;
+                            playerData[targetPlayer].playerStash = playerData[targetPlayer].playerStash + 1;
                             Console.WriteLine("Player " + (activePlayer + 1) + "'s new stash amount: " + playerData[activePlayer].playerStash);
                             Console.WriteLine("Player " + (targetPlayer + 1) + "'s new stash amount: " + playerData[targetPlayer].playerStash); //print new stash amounts
                             break; //exit out of the switch
