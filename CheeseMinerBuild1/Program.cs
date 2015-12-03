@@ -291,7 +291,7 @@ namespace CheeseMinerBuild1
 
                     if (cheeseCatcherX > 7 || cheeseCatcherX < 0) //check it is a position on the board
                     {
-                        Console.WriteLine("Space is infinite, unlike our board, please input a value between 0 and 8.", Environment.NewLine);
+                        Console.WriteLine("Please input a value between 0 and 7.", Environment.NewLine);
                         j = j - 1; //restart if not
                         continue;
                     }
@@ -309,7 +309,7 @@ namespace CheeseMinerBuild1
 
                     if (cheeseCatcherY > 7 || cheeseCatcherY < 0) //check if it isn't a position on the board
                     {
-                        Console.WriteLine("Space is infinite, unlike our board, please input a value between 0 and 8.", Environment.NewLine);
+                        Console.WriteLine("Please input a value between 0 and 8.", Environment.NewLine);
                         j = j - 1;
                         continue; //restart iteration
                     }
