@@ -74,7 +74,6 @@ namespace CheeseMinerBuild1
                         Console.WriteLine("You are on X Position: " + player_data[currentPlayer].xCoordinates);
                         Console.WriteLine("You are on Y Position: " + player_data[currentPlayer].yCoordinates);
                         int diceRoll = RollDice(); //find what number they rolled using the roll dice method
-                        Console.WriteLine("You rolled a " + diceRoll);
                         direction = MovementCatcher(); //find out what direction the user wants to move in using the movement catcher method
                         Console.WriteLine("You are moving " + diceRoll + " spaces in a " + direction + " direction"); //display their chosen move
                         MovementCalculator(playerList: ref player_data[currentPlayer], roll: diceRoll, movement: direction); //run the movement calculation method 
@@ -101,6 +100,7 @@ namespace CheeseMinerBuild1
                         {
                             currentPlayer++; //if not, add one
                         }
+                        Console.WriteLine(Environment.NewLine);
                     }
                 }
                 else //run the game in test mode
@@ -142,6 +142,7 @@ namespace CheeseMinerBuild1
                         {
                             currentPlayer++; //if not, add one
                         }
+                        Console.WriteLine(Environment.NewLine);
                     }
                 }
 
@@ -392,11 +393,11 @@ namespace CheeseMinerBuild1
                 playerInfo[1].yCoordinates = 0;
                 playerInfo[1].playerStash = 0;
 
-                playerInfo[2].xCoordinates = 0;
+                playerInfo[2].xCoordinates = 7;
                 playerInfo[2].yCoordinates = 7;
                 playerInfo[2].playerStash = 0;
 
-                playerInfo[3].xCoordinates = 7;
+                playerInfo[3].xCoordinates = 0;
                 playerInfo[3].yCoordinates = 7;
                 playerInfo[3].playerStash = 0;
             }
@@ -584,6 +585,7 @@ namespace CheeseMinerBuild1
                         Console.WriteLine("Invalid input, please try again! " + Environment.NewLine); //throw an error and restart if their input is invalid
                         continue;
                     }
+                    finalTarget = opponentPlayer[0]; //move the target over into the variable
                 }
                 else
                 {
