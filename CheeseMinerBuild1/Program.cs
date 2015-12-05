@@ -514,19 +514,19 @@ namespace CheeseMinerBuild1
             switch (movement.ToString().ToLower()) //check our movement direction
             {
                 case "n":
-                    playerList.yCoordinates = playerList.yCoordinates + roll; //if north, move up by roll amount
+                    playerList.yCoordinates = playerList.yCoordinates - roll; //if north, move up by roll amount
 
                     if (playerList.yCoordinates > 7) //if we go off the board
                     {
-                        playerList.yCoordinates = playerList.yCoordinates - 8; //wrap around to (y + roll) - 8
+                        playerList.yCoordinates = playerList.yCoordinates + 8; //wrap around to (y + roll) - 8
                     }
                     break;
                 case "s": //check if we're moving south
-                    playerList.yCoordinates = playerList.yCoordinates - roll; //if so, move down on the y axis by roll
+                    playerList.yCoordinates = playerList.yCoordinates + roll; //if so, move down on the y axis by roll
 
                     if (playerList.yCoordinates < 0)
                     {
-                        playerList.yCoordinates = playerList.yCoordinates + 8; //wrap around to (y - roll) + 8 if we go off the board
+                        playerList.yCoordinates = playerList.yCoordinates - 8; //wrap around to (y - roll) + 8 if we go off the board
                     }
                     break;
                 case "e":
