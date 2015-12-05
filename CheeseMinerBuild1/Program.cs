@@ -46,8 +46,34 @@ namespace CheeseMinerBuild1
             char test;
 
             Console.WriteLine("Welcome to Space Cheese Miner!");
-            Console.WriteLine("Do you wish to run the game in test mode? Y or N");
-            test = char.Parse(Console.ReadLine());
+            test = char.Parse("r"); //set a default value for our program
+
+            do //begin our test loop
+            {
+                Console.WriteLine("Do you wish to run the game in test mode? Y or N"); //check if they want to run in test mode
+                try
+                {
+                    test = char.Parse(Console.ReadLine()); //try and parse the input
+                }
+                catch //catch any exceptions
+                {
+                    Console.WriteLine("Please input a valid response!"); //throw an error
+                    Console.WriteLine(Environment.NewLine);
+                    continue; //restart the loop
+                }
+
+                if (test.ToString().ToLower() != "y" && test.ToString().ToLower() != "n") //check if our input isn't desired
+                {
+                    Console.WriteLine("Please input a valid response!");
+                    Console.WriteLine(Environment.NewLine);
+                    continue; //throw an error and restart the loop
+                }
+                else
+                {
+                    break; //otherwise exit out the loop
+                }
+            }
+            while (test.ToString().ToLower() != "y" || test.ToString().ToLower() != "n");
 
             player_data = PlayerCollection(playerData: ref player_data, numberOfPlayers: ref playerAmount); //begin method that collects player data
 
@@ -83,7 +109,7 @@ namespace CheeseMinerBuild1
 
                         if (collision == true) //check if we had a collision
                         {
-                            battleDecision = BattleDecisionMaker(opponentPlayer: collisionIndex, finalTarget: targetPlayer); //if so, run the method which gets user input if they want to battle
+                            battleDecision = BattleDecisionMaker(opponentPlayer: collisionIndex, finalTarget: ref targetPlayer); //if so, run the method which gets user input if they want to battle
                         }
 
                         if (battleDecision.ToString().ToLower() == "y") //check the user wants to battle
@@ -125,7 +151,7 @@ namespace CheeseMinerBuild1
 
                         if (collision == true) //check if we had a collision
                         {
-                            battleDecision = BattleDecisionMaker(opponentPlayer: collisionIndex, finalTarget: targetPlayer); //if so, run the method which gets user input if they want to battle
+                            battleDecision = BattleDecisionMaker(opponentPlayer: collisionIndex, finalTarget: ref targetPlayer); //if so, run the method which gets user input if they want to battle
                         }
 
                         if (battleDecision.ToString().ToLower() == "y") //check the user wants to battle
@@ -568,7 +594,7 @@ namespace CheeseMinerBuild1
                 return true; //return that there was a collision
             }
         }
-        static char BattleDecisionMaker(List<int> opponentPlayer, int finalTarget)
+        static char BattleDecisionMaker(List<int> opponentPlayer, ref int finalTarget)
         {
             char decision = char.Parse("u"); //initalise our variable with a default value
             do //intialise a big outer loop to get a valid input
