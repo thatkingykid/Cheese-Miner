@@ -1,5 +1,5 @@
 ﻿/*
-Space Cheese Mining v0.3.5
+Space Cheese Mining v1.0
 James King
 08101
 
@@ -83,7 +83,15 @@ namespace CheeseMinerBuild1
                 List<int> winningPlayer = new List<int>();
                 bool gameWon = false;
 
-                cheeseBoard = CheesePlacer(cheesePosition: ref cheeseBoard, playerNumber: playerAmount); //begin method that collects data on where the cheese will be placed
+                if (test.ToString().ToLower() == "n") //check if we're running in test mode
+                {
+                    cheeseBoard = CheesePlacer(cheesePosition: ref cheeseBoard, playerNumber: playerAmount); //begin method that collects data on where the cheese will be placed
+                }
+                else
+                {
+                    cheeseBoard = TestCheesePlacer(); //auto place cheese if we are
+                }
+
                 player_data = PlayerResetter(playerInfo: ref player_data); //reset the player's position on the board
                 int startingPlayer = CheeseHead(playerList: player_data); //begin method which finds out who starts the game
                 currentPlayer = startingPlayer; //get the index of the player who starts the game
@@ -99,6 +107,7 @@ namespace CheeseMinerBuild1
                         Console.WriteLine("Player " + (currentPlayer + 1) + ", " + player_data[currentPlayer].playerName);
                         Console.WriteLine("You are on X Position: " + player_data[currentPlayer].xCoordinates);
                         Console.WriteLine("You are on Y Position: " + player_data[currentPlayer].yCoordinates);
+                        Console.WriteLine("You have a score of: " + player_data[currentPlayer].playerStash);
                         int diceRoll = RollDice(); //find what number they rolled using the roll dice method
                         direction = MovementCatcher(); //find out what direction the user wants to move in using the movement catcher method
                         Console.WriteLine("You are moving " + diceRoll + " spaces in a " + direction + " direction"); //display their chosen move
@@ -140,6 +149,7 @@ namespace CheeseMinerBuild1
                         Console.WriteLine("Player " + (currentPlayer + 1) + ", " + player_data[currentPlayer].playerName);
                         Console.WriteLine("You are on X Position: " + player_data[currentPlayer].xCoordinates);
                         Console.WriteLine("You are on Y Position: " + player_data[currentPlayer].yCoordinates);
+                        Console.WriteLine("You have a score of: " + player_data[currentPlayer].playerStash);
                         int diceRoll = ReadDice(); //find what number they rolled using the roll dice method
                         Console.WriteLine("You rolled a " + diceRoll);
                         direction = MovementCatcher(); //find out what direction the user wants to move in using the movement catcher method
@@ -290,6 +300,7 @@ namespace CheeseMinerBuild1
             if (playerNumber == 3) //check if we have an odd number of players
             {
                 cheesePerPlayer = 5; //if so, remove one of the cheeses so it divides evenly
+                cheesePosition[6, 7] = true; //and hardcode a cheese in so we have 16 cheeses
             }
             else
             {
@@ -382,6 +393,27 @@ namespace CheeseMinerBuild1
                 }
             }
             return cheesePosition;
+        }
+        static bool[,] TestCheesePlacer() //use this method to assign pre-set cheese positions
+        {
+            bool[,] board = new bool[8, 8];
+            board[1, 0] = true;
+            board[3, 6] = true;
+            board[5, 3] = true;
+            board[2, 7] = true;
+            board[0, 5] = true;
+            board[0, 1] = true;
+            board[5, 5] = true;
+            board[2, 4] = true;
+            board[1, 3] = true;
+            board[6, 1] = true;
+            board[6, 2] = true;
+            board[6, 7] = true;
+            board[4, 5] = true;
+            board[5, 0] = true;
+            board[7, 6] = true;
+            board[6, 0] = true;
+            return board;
         }
         static player_info[] PlayerResetter(ref player_info[] playerInfo)
         {
@@ -537,7 +569,7 @@ namespace CheeseMinerBuild1
                 case "n":
                     playerList.yCoordinates = playerList.yCoordinates - roll; //if north, move up by roll amount
 
-                    if (playerList.yCoordinates > 7) //if we go off the board
+                    if (playerList.yCoordinates < 0) //if we go off the board
                     {
                         playerList.yCoordinates = playerList.yCoordinates + 8; //wrap around to (y + roll) - 8
                     }
@@ -545,7 +577,7 @@ namespace CheeseMinerBuild1
                 case "s": //check if we're moving south
                     playerList.yCoordinates = playerList.yCoordinates + roll; //if so, move down on the y axis by roll
 
-                    if (playerList.yCoordinates < 0)
+                    if (playerList.yCoordinates > 7)
                     {
                         playerList.yCoordinates = playerList.yCoordinates - 8; //wrap around to (y - roll) + 8 if we go off the board
                     }
@@ -744,14 +776,14 @@ namespace CheeseMinerBuild1
                             }
                             if (selectedMove == 1) //check if we're moving north
                             {
-                                MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("n")); //move the player up
+                                MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("s")); //move the player up
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>();
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: targetPlayer, detectedPlayer: ref playersOccupying); //check for a collision
                                 if (occupied == true) //if we have a collision
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine); //inform the player
-                                    MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("s")); //move them back one
+                                    MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("n")); //move them back one
                                     i--; //restart the loop
                                     continue;
                                 }
@@ -762,14 +794,14 @@ namespace CheeseMinerBuild1
                             }
                             else if (selectedMove == 2) //if we're moving south
                             {
-                                MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("s")); //move them back one
+                                MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("n")); //move them back one
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>();
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: targetPlayer, detectedPlayer: ref playersOccupying); //check collisions
                                 if (occupied == true) //if we have a collision
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("n")); //move them forwards and restart
+                                    MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("s")); //move them forwards and restart
                                     i--;
                                     continue;
                                 }
@@ -848,14 +880,14 @@ namespace CheeseMinerBuild1
                             }
                             if (selectedMove == 1) //if we're moving north
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move the user north
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move the user north
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check for a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we get one
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s"));
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n"));
                                     i--; //move them back and restart the loop
                                     continue;
                                 }
@@ -866,14 +898,14 @@ namespace CheeseMinerBuild1
                             }
                             else if (selectedMove == 2) //if they're moving south
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them south
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them south
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check if we have a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we have a collision
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them back and try again
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them back and try again
                                     i--;
                                     continue;
                                 }
@@ -965,14 +997,14 @@ namespace CheeseMinerBuild1
                             }
                             if (selectedMove == 1) //if we're moving north
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move the user north
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move the user north
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check for a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we get one
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s"));
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n"));
                                     i--; //move them back and restart the loop
                                     continue;
                                 }
@@ -983,14 +1015,14 @@ namespace CheeseMinerBuild1
                             }
                             else if (selectedMove == 2) //if they're moving south
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them south
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them south
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check if we have a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we have a collision
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them back and try again
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them back and try again
                                     i--;
                                     continue;
                                 }
@@ -1082,14 +1114,14 @@ namespace CheeseMinerBuild1
                             }
                             if (selectedMove == 1) //if we're moving north
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move the user north
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move the user north
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check for a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we get one
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s"));
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n"));
                                     i--; //move them back and restart the loop
                                     continue;
                                 }
@@ -1100,14 +1132,14 @@ namespace CheeseMinerBuild1
                             }
                             else if (selectedMove == 2) //if they're moving south
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them south
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them south
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check if we have a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we have a collision
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them back and try again
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them back and try again
                                     i--;
                                     continue;
                                 }
@@ -1224,14 +1256,14 @@ namespace CheeseMinerBuild1
                             }
                             if (selectedMove == 1) //check if we're moving north
                             {
-                                MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("n")); //move the player up
+                                MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("s")); //move the player down
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>();
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: targetPlayer, detectedPlayer: ref playersOccupying); //check for a collision
                                 if (occupied == true) //if we have a collision
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine); //inform the player
-                                    MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("s")); //move them back one
+                                    MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("n")); //move them up one
                                     i--; //restart the loop
                                     continue;
                                 }
@@ -1242,14 +1274,14 @@ namespace CheeseMinerBuild1
                             }
                             else if (selectedMove == 2) //if we're moving south
                             {
-                                MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("s")); //move them back one
+                                MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("n")); //move them up one
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>();
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: targetPlayer, detectedPlayer: ref playersOccupying); //check collisions
                                 if (occupied == true) //if we have a collision
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("n")); //move them forwards and restart
+                                    MovementCalculator(playerList: ref playerData[targetPlayer], roll: 1, movement: char.Parse("s")); //move them back and restart
                                     i--;
                                     continue;
                                 }
@@ -1328,14 +1360,14 @@ namespace CheeseMinerBuild1
                             }
                             if (selectedMove == 1) //if we're moving north
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move the user north
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move the user south
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check for a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we get one
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s"));
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n"));
                                     i--; //move them back and restart the loop
                                     continue;
                                 }
@@ -1346,14 +1378,14 @@ namespace CheeseMinerBuild1
                             }
                             else if (selectedMove == 2) //if they're moving south
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them south
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them north
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check if we have a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we have a collision
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them back and try again
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them back and try again
                                     i--;
                                     continue;
                                 }
@@ -1445,14 +1477,14 @@ namespace CheeseMinerBuild1
                             }
                             if (selectedMove == 1) //if we're moving north
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move the user north
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move the user south
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check for a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we get one
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s"));
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n"));
                                     i--; //move them back and restart the loop
                                     continue;
                                 }
@@ -1463,14 +1495,14 @@ namespace CheeseMinerBuild1
                             }
                             else if (selectedMove == 2) //if they're moving south
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them south
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them north
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check if we have a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we have a collision
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them back and try again
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them back and try again
                                     i--;
                                     continue;
                                 }
@@ -1562,14 +1594,14 @@ namespace CheeseMinerBuild1
                             }
                             if (selectedMove == 1) //if we're moving north
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move the user north
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move the user south
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check for a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we get one
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s"));
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n"));
                                     i--; //move them back and restart the loop
                                     continue;
                                 }
@@ -1580,14 +1612,14 @@ namespace CheeseMinerBuild1
                             }
                             else if (selectedMove == 2) //if they're moving south
                             {
-                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them south
+                                MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them south
                                 bool occupied = false;
                                 List<int> playersOccupying = new List<int>(); //check if we have a collision
                                 occupied = CollisionDetector(playerList: playerData, currentIndex: activePlayer, detectedPlayer: ref playersOccupying);
                                 if (occupied == true) //if we have a collision
                                 {
                                     Console.WriteLine("Space is already occupied, please try again! " + Environment.NewLine);
-                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("n")); //move them back and try again
+                                    MovementCalculator(playerList: ref playerData[activePlayer], roll: 1, movement: char.Parse("s")); //move them back and try again
                                     i--;
                                     continue;
                                 }
