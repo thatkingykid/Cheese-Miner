@@ -46,11 +46,11 @@ namespace CheeseMinerBuild1
             char test;
 
             Console.WriteLine("Welcome to Space Cheese Miner!");
-            test = char.Parse("r"); //set a default value for our program
+            test = char.Parse("r"); //set a default value for our test char
 
             do //begin our test loop
             {
-                Console.WriteLine("Do you wish to run the game in test mode? Y or N"); //check if they want to run in test mode
+                Console.WriteLine("Do you wish to run the game in Manual Mode? Y or N"); //check if they want to run in test mode
                 try
                 {
                     test = char.Parse(Console.ReadLine()); //try and parse the input
@@ -468,9 +468,30 @@ namespace CheeseMinerBuild1
         }
         static int ReadDice()
         {
+            int diceRoll = 0; //assign our dice roll variable
             Console.WriteLine("Input your dice roll: ");
-            int diceRoll = int.Parse(Console.ReadLine()); //get the user's roll input
-            return diceRoll;
+            do
+            {
+                try
+                {
+                    diceRoll = int.Parse(Console.ReadLine()); //get the user's roll input
+                }
+                catch //catch any exceptions
+                {
+                    Console.WriteLine("Please input a valid dice roll! "); //throw an error
+                    Console.WriteLine(Environment.NewLine);
+                    continue; //restart the block to get the user's input
+                }
+
+                if (diceRoll < 1 || diceRoll > 6) //check that it's in the bounds of a 6 sided die
+                {
+                    Console.WriteLine("Please input a dice roll between 1 and 6! "); //throw an error if not
+                    Console.WriteLine(Environment.NewLine);
+                    continue; //restart the block
+                }
+            }
+            while (diceRoll < 1 || diceRoll > 6);
+            return diceRoll; //return the dice roll
         }
         static char MovementCatcher()
         {
