@@ -1,5 +1,5 @@
 ﻿/*
-Space Cheese Mining v1.0
+Space Cheese Mining v1.0.1
 James King
 08101
 
@@ -12,7 +12,7 @@ Implemented in this build:
 - Battle system
 - Scoring the game
 - Bug squashing
-
+- Changed the .NET Framework target to get it to run on the machines at uni
 
 */
 using System;
